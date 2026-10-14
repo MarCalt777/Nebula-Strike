@@ -31,3 +31,5 @@ Spēlētājs: test | Punkti: 30
 Spēlētājs: Marcis | Punkti: 1130
 Spēlētājs: test | Punkti: 470
 Spēlētājs: test | Punkti: 460
+Spēlētājs: test | Punkti: 390
+Spēlētājs: test | Punkti: 770
