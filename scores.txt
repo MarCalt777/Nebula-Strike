@@ -33,3 +33,15 @@ Spēlētājs: test | Punkti: 470
 Spēlētājs: test | Punkti: 460
 Spēlētājs: test | Punkti: 390
 Spēlētājs: test | Punkti: 770
+Spēlētājs: test3 | Punkti: 290
+Spēlētājs: test5 | Punkti: 0
+Spēlētājs: test6 | Punkti: 0
+Spēlētājs: test6 | Punkti: 0
+Spēlētājs: test 7 | Punkti: 180
+Spēlētājs: test 7 | Punkti: 150
+Spēlētājs: test 7 | Punkti: 230
+Spēlētājs: test 8 | Punkti: 730
+Spēlētājs: test 9 | Punkti: 140
+Spēlētājs: test 10 | Punkti: 520
+Spēlētājs: test11 | Punkti: 620
+Spēlētājs: test11 | Punkti: 570
