@@ -143,23 +143,35 @@ class Enemy(pygame.sprite.Sprite):
         self.max_hp = min(5, 1 + (level - 1) // 2)
         self.hp = self.max_hp
 
-        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.update_design()
         self.rect = self.image.get_rect(topleft=(x, y))
         self.dx = random.choice([-2, 2]) * (1 + level * 0.2)
         self.shoot_timer = random.randint(30, 100)
 
     def update_design(self):
-        self.image.fill((0, 0, 0, 0))
-        colors = {
-            1: (230, 50, 50),
-            2: (230, 130, 50),
-            3: (230, 230, 50),
-            4: (50, 200, 200),
-            5: (180, 50, 230)
+        # Pretinieku attēlu karte atbilstoši to max_hp / līmenim
+        ship_images = {
+            1: "ship_green.png",   # 1. lvl zaļais kuģis[cite: 2]
+            2: "ship_red.png",     # 2. lvl sarkanais kuģis[cite: 5]
+            3: "ship_yellow.png",  # 3. lvl dzeltenais kuģis[cite: 3]
+            4: "ship_cyan.png",    # 4. lvl gaiši zilais kuģis[cite: 1]
+            5: "ship_purple.png"   # 5. lvl violetais kuģis[cite: 4]
         }
-        color = colors.get(self.max_hp, (180, 50, 230))
-        pygame.draw.rect(self.image, color, (0, 0, self.width, self.height), border_radius=4)
+        filename = ship_images.get(self.max_hp, "ship_green.png")
+        try:
+            self.image = pygame.image.load(filename).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (45, 40))
+        except Exception:
+            self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+            colors = {
+                1: (230, 50, 50),
+                2: (230, 130, 50),
+                3: (230, 230, 50),
+                4: (50, 200, 200),
+                5: (180, 50, 230)
+            }
+            color = colors.get(self.max_hp, (180, 50, 230))
+            pygame.draw.rect(self.image, color, (0, 0, self.width, self.height), border_radius=4)
 
     def update(self):
         self.rect.x += self.dx
@@ -249,7 +261,6 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         if player_name.strip() != "":
-                            # Mēģinām reģistrēt un pieteikt lietotāju serverī
                             try:
                                 requests.post(f"{SERVER_URL}/register", json={"name": player_name.strip(), "password": "123"})
                             except Exception:
@@ -271,14 +282,14 @@ def main():
 
             elif game_state == "PLAYING":
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
+                    if event.button == 1 and fast_shoot_timer <= 0:
                         if shoot_cooldown <= 0:
                             b = Bullet(player.rect.centerx, player.rect.top)
                             bullets.add(b)
-                            shoot_cooldown = 6 if fast_shoot_timer > 0 else 12
+                            shoot_cooldown = 12
                     elif event.button == 3:
                         if special_ready and laser_timer <= 0:
-                            laser_timer = 180
+                            laser_timer = 120  # 120 kadri = 2 sekundes
                             special_charge = 0
                             special_ready = False
 
@@ -311,6 +322,13 @@ def main():
                 shield_timer -= 1
             if fast_shoot_timer > 0:
                 fast_shoot_timer -= 1
+
+            # Ja ir aktīvs oranžais power-up, automātiski šauj, ja poga tiek turēta (cooldown 8 kadri)
+            if fast_shoot_timer > 0 and pygame.mouse.get_pressed()[0]:
+                if shoot_cooldown <= 0:
+                    b = Bullet(player.rect.centerx, player.rect.top)
+                    bullets.add(b)
+                    shoot_cooldown = 8
 
             keys_pressed = pygame.key.get_pressed()
             player.update(keys_pressed)

@@ -6,7 +6,7 @@ body {
 }
 
 h1 {
-    color: orange;
+    color: #24B0FF;
 }
 
 table {
@@ -21,7 +21,7 @@ th, td {
 }
 
 .first {
-    color: gold;
+    color: #0FC3FF;
     font-weight: bold;
 }
 
@@ -30,7 +30,7 @@ nav {
 }
 
 nav a {
-    color: orange;
+    color: #75cdff;
     margin-right: 20px;
     text-decoration: none;
     font-size: 18px;
