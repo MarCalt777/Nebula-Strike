@@ -44,7 +44,6 @@ def send_score_to_server(player_token, final_score):
             headers = {"token": player_token}
             requests.post(f"{SERVER_URL}/scores", json={"score": final_score}, headers=headers)
 
-        # Iegūstam top rezultātus no servera
         response = requests.get(f"{SERVER_URL}/scores/top")
         if response.status_code == 200:
             top_data = response.json()
@@ -54,7 +53,6 @@ def send_score_to_server(player_token, final_score):
                 row_class = ' class="first"' if i == 1 else ""
                 rows_html += f'        <tr{row_class}><td>{i}</td><td>{entry["player"]}</td><td>{entry["score"]}</td></tr>\n'
 
-            # Atjaunojam leaderboard.html failu, saglabājot sākotnējo HTML struktūru
             if os.path.exists("web/leaderboard.html"):
                 with open("web/leaderboard.html", "r", encoding="utf-8") as html_file:
                     content = html_file.read()
@@ -66,7 +64,6 @@ def send_score_to_server(player_token, final_score):
                     before_table = content.split(start_tag)[0]
                     after_table = content.split(end_tag)[1]
 
-                    # Uzbūvējam tabulu no jauna, aizvietojot visu, kas bija iekšpusē, ar jaunajām rindām
                     new_table = f"{start_tag}\n        <!-- TABLE_ROWS -->\n{rows_html}{end_tag}"
                     final_html = before_table + new_table + after_table
 
@@ -121,12 +118,12 @@ class Bullet(pygame.sprite.Sprite):
 
 class EnemyBullet(pygame.sprite.Sprite):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, level):
         super().__init__()
         self.image = pygame.Surface((6, 12), pygame.SRCALPHA)
         pygame.draw.rect(self.image, ENEMY_BULLET_COLOR, (0, 0, 6, 12), border_radius=2)
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.speed = 4
+        self.speed = 4 + min(6, (level - 1) // 1)
 
     def update(self):
         self.rect.y += self.speed
@@ -140,24 +137,34 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.width = 40
         self.height = 30
-        self.max_hp = min(5, 1 + (level - 1) // 2)
+        self.level = level
+        
+        self.max_hp = level
         self.hp = self.max_hp
+
+        self.design_id = ((level - 1) % 5) + 1
 
         self.update_design()
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.dx = random.choice([-2, 2]) * (1 + level * 0.2)
-        self.shoot_timer = random.randint(30, 100)
+        
+        # Tagad ātrums aug daudz straujāk (+40% katrā līmenī: 1.līmenī ~2.5, 2.līmenī ~3.5, 3.līmenī ~4.5 utt.)
+        base_speed = random.choice([-2.5, 2.5])
+        speed_multiplier = 1 + (level - 1) * 0.4
+        self.dx = base_speed * speed_multiplier
+
+        min_t = max(12, 45 - level * 6)
+        max_t = max(25, 90 - level * 8)
+        self.shoot_timer = random.randint(min_t, max_t)
 
     def update_design(self):
-        # Pretinieku attēlu karte atbilstoši to max_hp / līmenim
         ship_images = {
-            1: "ship_green.png",   # 1. lvl zaļais kuģis[cite: 2]
-            2: "ship_red.png",     # 2. lvl sarkanais kuģis[cite: 5]
-            3: "ship_yellow.png",  # 3. lvl dzeltenais kuģis[cite: 3]
-            4: "ship_cyan.png",    # 4. lvl gaiši zilais kuģis[cite: 1]
-            5: "ship_purple.png"   # 5. lvl violetais kuģis[cite: 4]
+            1: "ship_green.png",   
+            2: "ship_red.png",     
+            3: "ship_yellow.png",  
+            4: "ship_cyan.png",    
+            5: "ship_purple.png"   
         }
-        filename = ship_images.get(self.max_hp, "ship_green.png")
+        filename = ship_images.get(self.design_id, "ship_purple.png")
         try:
             self.image = pygame.image.load(filename).convert_alpha()
             self.image = pygame.transform.scale(self.image, (45, 40))
@@ -170,17 +177,25 @@ class Enemy(pygame.sprite.Sprite):
                 4: (50, 200, 200),
                 5: (180, 50, 230)
             }
-            color = colors.get(self.max_hp, (180, 50, 230))
+            color = colors.get(self.design_id, (180, 50, 230))
             pygame.draw.rect(self.image, color, (0, 0, self.width, self.height), border_radius=4)
 
     def update(self):
         self.rect.x += self.dx
-        if self.rect.left <= 10 or self.rect.right >= SCREEN_WIDTH - 10:
+        
+        # Droša robežu pārbaude, lai neizlido ārpus ekrāna
+        if self.rect.left <= 10:
+            self.rect.left = 10
+            self.dx *= -1
+        elif self.rect.right >= SCREEN_WIDTH - 10:
+            self.rect.right = SCREEN_WIDTH - 10
             self.dx *= -1
 
         self.shoot_timer -= 1
         if self.shoot_timer <= 0:
-            self.shoot_timer = random.randint(60, 140)
+            min_t = max(12, 45 - self.level * 6)
+            max_t = max(25, 90 - self.level * 8)
+            self.shoot_timer = random.randint(min_t, max_t)
             return True
         return False
 
@@ -233,7 +248,10 @@ def main():
     player = Player(SCREEN_WIDTH // 2 - 20, 500)
     score = 0
     level = 1
-    enemies_defeated = 0
+    
+    total_enemies_in_wave = 20
+    enemies_spawned_in_wave = 0
+    enemies_defeated_in_wave = 0
 
     special_charge = 0
     special_ready = False
@@ -281,7 +299,10 @@ def main():
                             player_name += event.unicode
 
             elif game_state == "PLAYING":
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        game_state = "PAUSED"
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1 and fast_shoot_timer <= 0:
                         if shoot_cooldown <= 0:
                             b = Bullet(player.rect.centerx, player.rect.top)
@@ -289,9 +310,16 @@ def main():
                             shoot_cooldown = 12
                     elif event.button == 3:
                         if special_ready and laser_timer <= 0:
-                            laser_timer = 120  # 120 kadri = 2 sekundes
+                            laser_timer = 120  
                             special_charge = 0
                             special_ready = False
+
+            elif game_state == "PAUSED":
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        game_state = "PLAYING"
+                    elif event.key == pygame.K_l:
+                        running = False
 
             elif game_state == "GAMEOVER":
                 if event.type == pygame.KEYDOWN:
@@ -301,7 +329,9 @@ def main():
                         player.hp = 3
                         score = 0
                         level = 1
-                        enemies_defeated = 0
+                        total_enemies_in_wave = 20
+                        enemies_spawned_in_wave = 0
+                        enemies_defeated_in_wave = 0
                         special_charge = 0
                         special_ready = False
                         laser_timer = 0
@@ -323,7 +353,6 @@ def main():
             if fast_shoot_timer > 0:
                 fast_shoot_timer -= 1
 
-            # Ja ir aktīvs oranžais power-up, automātiski šauj, ja poga tiek turēta (cooldown 8 kadri)
             if fast_shoot_timer > 0 and pygame.mouse.get_pressed()[0]:
                 if shoot_cooldown <= 0:
                     b = Bullet(player.rect.centerx, player.rect.top)
@@ -333,21 +362,28 @@ def main():
             keys_pressed = pygame.key.get_pressed()
             player.update(keys_pressed)
 
-            level = 1 + score // 50
+            # --- VIĻŅU UN LĪMEŅU LOĢIKA ---
+            if enemies_defeated_in_wave >= total_enemies_in_wave and len(enemies) == 0:
+                level += 1
+                enemies_spawned_in_wave = 0
+                enemies_defeated_in_wave = 0
+                total_enemies_in_wave = 20 if level <= 2 else 20 + (level - 2) * 5
 
             enemy_spawn_timer += 1
-            if enemy_spawn_timer > max(30, 70 - level * 10) and len(enemies) < 7:
-                e = Enemy(random.randint(50, SCREEN_WIDTH - 90), random.randint(50, 220), level)
-                enemies.add(e)
-                enemy_spawn_timer = 0
+            spawn_threshold = max(35, 80 - level * 5)
+            if enemies_spawned_in_wave < total_enemies_in_wave and len(enemies) < 6:
+                if enemy_spawn_timer > spawn_threshold:
+                    e = Enemy(random.randint(50, SCREEN_WIDTH - 90), random.randint(50, 220), level)
+                    enemies.add(e)
+                    enemies_spawned_in_wave += 1
+                    enemy_spawn_timer = 0
 
-            if level >= 3:
-                asteroid_spawn_timer += 1
-                level_steps = (level - 3) // 3
-                spawn_threshold = max(40, 160 - level_steps * 30)
-                if asteroid_spawn_timer > spawn_threshold and len(asteroids) < 7:
-                    asteroids.add(Asteroid(level))
-                    asteroid_spawn_timer = 0
+            asteroid_spawn_timer += 1
+            max_asteroids = min(12, 2 + (level - 1) * 2)
+            spawn_threshold_ast = max(40, 160 - level * 20)
+            if asteroid_spawn_timer > spawn_threshold_ast and len(asteroids) < max_asteroids:
+                asteroids.add(Asteroid(level))
+                asteroid_spawn_timer = 0
 
             bullets.update()
             enemy_bullets.update()
@@ -356,7 +392,7 @@ def main():
 
             for e in enemies:
                 if e.update():
-                    enemy_bullets.add(EnemyBullet(e.rect.centerx - 3, e.rect.bottom))
+                    enemy_bullets.add(EnemyBullet(e.rect.centerx - 3, e.rect.bottom, level))
 
             # Kolīzijas
             ast_hits = pygame.sprite.spritecollide(player, asteroids, True)
@@ -381,6 +417,7 @@ def main():
                     if laser_rect.colliderect(e.rect):
                         e.kill()
                         score += 10
+                        enemies_defeated_in_wave += 1
                 for eb in enemy_bullets:
                     if laser_rect.colliderect(eb.rect):
                         eb.kill()
@@ -392,7 +429,7 @@ def main():
                     if e.hp <= 0:
                         e.kill()
                         score += 10
-                        enemies_defeated += 1
+                        enemies_defeated_in_wave += 1
                         if not special_ready and laser_timer <= 0:
                             special_charge += 1
                             if special_charge >= 5:
@@ -424,7 +461,7 @@ def main():
             )
             screen.blit(name_surf, (SCREEN_WIDTH // 2 - name_surf.get_width() // 2, 320))
 
-        elif game_state == "PLAYING":
+        elif game_state in ("PLAYING", "PAUSED"):
             pygame.draw.line(screen, (40, 40, 70), (0, 310), (SCREEN_WIDTH, 310), 2)
 
             if shield_timer > 0:
@@ -442,11 +479,15 @@ def main():
 
             score_text = font_small.render(f"Punkti: {score} | Līmenis: {level}", True, TEXT_COLOR)
             hp_text = font_small.render(f"Dzīvības: {max(0, player.hp)}", True, TEXT_COLOR)
+            
+            enemies_left_in_wave = max(0, total_enemies_in_wave - enemies_defeated_in_wave)
+            wave_text = font_small.render(f"Atlikušie kuģi: {enemies_left_in_wave}/{total_enemies_in_wave}", True, YELLOW)
 
             screen.blit(score_text, (20, 20))
             screen.blit(hp_text, (20, 50))
+            screen.blit(wave_text, (20, 80))
 
-            y_offset = 85
+            y_offset = 115
             if laser_timer > 0:
                 special_text = font_small.render(f"LĀZERS AKTĪVS! ({laser_timer // 60 + 1}s)", True, LASER_COLOR)
                 screen.blit(special_text, (20, y_offset))
@@ -468,6 +509,19 @@ def main():
             if fast_shoot_timer > 0:
                 fast_text = font_small.render(f"Ātrā šaušana: {fast_shoot_timer // 60 + 1}s", True, FAST_SHOOT_COLOR)
                 screen.blit(fast_text, (20, y_offset))
+
+            if game_state == "PAUSED":
+                overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 160))
+                screen.blit(overlay, (0, 0))
+
+                pause_surf = font_large.render("PAUZE", True, WHITE)
+                resume_surf = font_small.render("Spied 'P', lai turpinātu spēli", True, YELLOW)
+                exit_surf = font_small.render("Spied 'L', lai izietu no spēles", True, (230, 50, 50))
+
+                screen.blit(pause_surf, (SCREEN_WIDTH // 2 - pause_surf.get_width() // 2, 200))
+                screen.blit(resume_surf, (SCREEN_WIDTH // 2 - resume_surf.get_width() // 2, 280))
+                screen.blit(exit_surf, (SCREEN_WIDTH // 2 - exit_surf.get_width() // 2, 330))
 
         elif game_state == "GAMEOVER":
             go_surf = font_large.render("SPĒLE BEIGUSIES", True, (230, 50, 50))
