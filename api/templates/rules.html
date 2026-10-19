@@ -3,37 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <title>Nebula Strike - Noteikumi un mehānikas</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav>
-        <a href="leaderboard.html">TOP Rezultāti</a>
-    </nav>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/" class="btn">🏆 Līderu Tabula</a>
+        </div>
 
-    <h1>Spēles mērķis, noteikumi un mehānikas</h1>
-    <h2>Mērķis:</h2>
-    <ul>
-        <li>Krāt punktus nošaujot pretinieka kuģus lai dabūtu labāko rezultātu starp visiem spēlētājiem, tajā laikā, izvairoties no ienaidnieku kuģu izšautajām lodēm un no random asteroīdiem kas lido uz tavu pusi</li>
-    </ul>
+        <h1>🚀 Nebula Strike Noteikumi</h1>
+        
+        <div class="rules-section">
+            <h2>🎯 Spēles Mērķis</h2>
+            <p>
+                <strong>Nebula Strike</strong> ir dinamiska 2D kosmosa šāvēja spēle. Tavs mērķis ir izdzīvot pēc iespējas ilgāk, iznīcināt ienaidnieku kuģus un izvairīties no bīstamiem asteroīdiem. 
+                Sauc cīņā savus refleksus, vāc uzlabojumus (*Power-ups*), uzlādē specefektus un uzstādi jaunu personīgo un globālo rekordu!
+            </p>
+        </div>
 
-    <hr>
-    
-    <h2>Vadība:</h2>
-    <ul>
-        <li><strong>W, A, S, D</strong> – Kustība</li>
-        <li><strong>Kreisais peles taustiņš</strong> – Šaušana</li>
-        <li><strong>Labais peles taustiņš</strong> – "Special ability"</li>
-        <li><strong>P</strong> – Nopauzē spēli</li>
-    </ul>
+        <div class="rules-section">
+            <h2>🎮 Vadība</h2>
+            <table class="controls-table">
+                <thead>
+                    <tr>
+                        <th>Taustiņš / Darbība</th>
+                        <th>Nozīme</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>W, A, S, D</strong></td>
+                        <td>Vadīt kosmosa kuģi (Augšup, Pa kreisi, Lejup, Pa labi)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kreisais peles klikšķis (LMB)</strong></td>
+                        <td>Parastā šaušana ar lāzera šāviņiem</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Labais peles klikšķis (RMB)</strong></td>
+                        <td>Aktivizēt speciālo spēju (Super Lāzeru), kad skala ir pilna</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P</strong></td>
+                        <td>Pauzēt / atsākt spēli</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L</strong></td>
+                        <td>Iziet no spēles (tikai pauzes izvēlnē)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R</strong></td>
+                        <td>Pārlādēt un sākt jaunu spēli pēc zaudējuma (*Game Over*)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ESC</strong></td>
+                        <td>Aizvērt spēli / iziet uz galveno izvēlni</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <hr>
+        <div class="rules-section">
+            <h2>💥 Unikālās Mehānikas un Bonusi</h2>
+            <ul>
+                <li>
+                    <strong>⚡ Super Lāzers (RMB):</strong> Par katru iznīcināto ienaidnieku tiek uzlādēta speciālā skala (+1 punkts). Kad tā sasniedz 5 punktus, vari izšaut super lāzeru, kas momentāni iznīcina visus pretiniekus un lodes savā ceļā.
+                </li>
+                <li>
+                    <strong>🟢 Dzīvības atjaunošana (Zaļais bonus):</strong> +1 veselības punktu (HP), un tos nav uzkrāt.
+                </li>
+                <li>
+                    <strong>🔵 Aizsargvairogs (Zilais bonus):</strong> Izveido laika aizsargvairogu, kas uz dažām sekundēm padara kuģi neievainojamu pret ienaidnieku šāviņiem un sadursmēm ar asteroīdiem.
+                </li>
+                <li>
+                    <strong>🟠 Ātršaušanas režīms (Oranžais bonus):</strong> Uz 5 sekundēm ievērojami palielina šaušanas ātrumu (var turēt nospiestu peles pogu).
+                </li>
+            </ul>
+        </div>
 
-    <h2>Spēles mehānikas</h2>
-    <ol>
-        <li><strong>"Power-Up"</strong> - Ir trīs dažādi Power-Up, pirmais ir zaļais kas iedot +1 dzīvību, otrais ir zilais kuru paņemot apkārt tavam kuģim parādas zils vairogs kas bloķē gan pretinieku lodes, gan asteroīdus. Un trešais ir oranžais kuru paņemot uz 5 sekundēm palielinās šaušanas ātrums un nav jāspaida, tikai jātur</li>
-        <p></p>
-        <li><strong>"Special ability"</strong> - viņu var izmantot kad ir nošauti 5 pretinieku kuģi, viņš ilgst 2 sekundes un neatkarīgi no pretinieka hp daudzuma, pretinieka kuģis tiek nošauts momentāli</li>
-    </ol>
+        <div class="rules-section">
+            <h2>📊 Punktu Skaitīšana un Grūtība</h2>
+            <ul>
+                <li><strong>Ienaidnieka iznīcināšana:</strong> Dod 10 punktus par katru iznīcināto ienaidnieku.</li>
+                <li><strong>Zaudējums:</strong> Sadursme ar asteroīdu noņem 3hp un ienaidnieka lode atņem 1 HP. Spēle beidzas, kad HP sasniedz 0.</li>
+                <li><strong>Grūtības pieaugums:</strong> Ar katru nākamo līmeni ienaidnieku pārvietošanās un šaušanas ātrums pakāpeniski palielinās!</li>
+            </ul>
+        </div>
 
+        <div class="rules-section">
+            <h2>💡 Padomi Izdzīvošanai</h2>
+            <ul>
+                <li>Izmanto Super Lāzeru lietderīgi — izmanto to, kad ekrānā ir kļuvis pārāk daudz ienaidnieku!</li>
+                <li>Pievērs uzmanību asteroīdiem — tos nevar iznīcināt ar parastajiem šāviņiem, no tiem ir jāizvairās.</li>
+                <li>Aizsargvairoga laikā vari droši triekties virsū asteroīdiem, tie pazudīs un būs vieglāk manevrēt pa laukumu.</li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

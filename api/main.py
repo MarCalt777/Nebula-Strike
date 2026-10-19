@@ -1,10 +1,17 @@
 import hashlib
 import secrets
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from api.db import get_connection
 
 app = FastAPI()
+
+# Piesaistām statiskos failus (CSS) un Jinja2 templatus
+app.mount("/static", StaticFiles(directory="api/templates"), name="static")
+templates = Jinja2Templates(directory="api/templates")
 
 class UserIn(BaseModel):
     name: str
@@ -71,6 +78,7 @@ def top():
         ).fetchall()
     return [{"player": p, "score": s} for p, s in rows]
 
+# JSON endpoints statistikai (kā bija iepriekš)
 @app.get("/players/{name}/stats")
 def player_stats(name: str):
     with get_connection() as conn:
@@ -81,3 +89,36 @@ def player_stats(name: str):
     if row is None or row[0] == 0:
         raise HTTPException(404, "Spēlētājs nav atrasts vai nav spēļu")
     return {"player": name, "games_played": row[0], "best_score": row[1]}
+
+# --- HTML LAPAS (Jinja2) ---
+
+@app.get("/", response_class=HTMLResponse)
+def leaderboard_page(request: Request):
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT player, score FROM scores ORDER BY score DESC LIMIT 10"
+        ).fetchall()
+    scores = [{"player": p, "score": s} for p, s in rows]
+    return templates.TemplateResponse(request, "leaderboard.html", {"scores": scores})
+
+@app.get("/rules", response_class=HTMLResponse)
+def rules_page(request: Request):
+    return templates.TemplateResponse(request, "rules.html", {})
+
+# Jauns HTML maršruts spēlētāja profilam: /players/{name}
+@app.get("/players/{name}", response_class=HTMLResponse)
+def player_profile_page(request: Request, name: str):
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT COUNT(*), MAX(score) FROM scores WHERE player = ?",
+            (name,)
+        ).fetchone()
+    
+    games_played = row[0] if row and row[0] else 0
+    best_score = row[1] if row and row[1] is not None else 0
+    
+    return templates.TemplateResponse(request, "player.html", {
+        "player": name,
+        "games_played": games_played,
+        "best_score": best_score
+    })

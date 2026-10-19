@@ -2,28 +2,39 @@
 <html lang="lv">
 <head>
     <meta charset="UTF-8">
-    <title>Nebula Strike - Līderu tabula</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Strike — Līderu Tabula</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav>
-        <a href="rules.html">Noteikumi un mehānikas</a>
-    </nav>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/rules" class="btn">📖 Noteikumi un Mehānikas</a>
+        </div>
 
-    <h1>TOP Rezultāti</h1>
-    <table>
-        <tr><th>#</th><th>Spēlētājs</th><th>Punkti</th></tr>
-        <!-- TABLE_ROWS -->
-        <tr class="first"><td>1</td><td>Marcis</td><td>1850</td></tr>
-        <tr><td>2</td><td>Marcello</td><td>1260</td></tr>
-        <tr><td>3</td><td>Marcello</td><td>950</td></tr>
-        <tr><td>4</td><td>Marcello</td><td>950</td></tr>
-        <tr><td>5</td><td>Marcello</td><td>950</td></tr>
-        <tr><td>6</td><td>Marcello</td><td>880</td></tr>
-        <tr><td>7</td><td>Marcello</td><td>720</td></tr>
-        <tr><td>8</td><td>Marcello</td><td>600</td></tr>
-        <tr><td>9</td><td>Marcis</td><td>580</td></tr>
-        <tr><td>10</td><td>Marcello</td><td>500</td></tr>
-    </table>
+        <h1>🏆 TOP Rezultāti</h1>
+        
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Spēlētājs</th>
+                    <th>Punkti</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for score in scores %}
+                <tr>
+                    <td><strong>{{ loop.index }}</strong></td>
+                    <td>
+                        <!-- Izmantojam score.player, jo mainīgais main.py failā ir "player" -->
+                        <a href="/players/{{ score.player }}">{{ score.player }}</a>
+                    </td>
+                    <td><strong>{{ score.score }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

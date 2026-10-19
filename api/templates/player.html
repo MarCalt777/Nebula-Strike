@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Strike — Spēlētāja Profils: {{ player }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/" class="btn">🏆 Atpakaļ uz Līderu Tabulu</a>
+            <a href="/rules" class="btn">📖 Noteikumi</a>
+        </div>
+
+        <!-- Izmantojam {{ player }}, jo main.py padod to ar šādu nosaukumu -->
+        <h1>🚀 Spēlētājs: {{ player }}</h1>
+        
+        <div class="rules-section">
+            <h2>📊 Spēlētāja Statistika</h2>
+            <table class="controls-table">
+                <thead>
+                    <tr>
+                        <th>Rādītājs</th>
+                        <th>Vērtība</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Aizvadītās spēles</strong></td>
+                        <td>{{ games_played }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Labākais rezultāts (Best Score)</strong></td>
+                        <td><strong style="color: #00d2ff;">{{ best_score }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+pygame
+requests
+fastapi
+uvicorn
+pydantic
+jinja2

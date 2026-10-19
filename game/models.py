@@ -55,7 +55,7 @@ class EnemyBullet:
         self.y = y
         self.width = 6
         self.height = 12
-        self.speed = 4 + min(6, (level - 1))
+        self.speed = 4 + min(6, ((level - 1) // 2))
         self.active = True
 
     def update(self, screen_height):

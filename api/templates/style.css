@@ -1,42 +1,148 @@
+/* Globālie iestatījumi un fonti */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    background: #16202e;
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 40px;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    line-height: 1.6;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-h1 {
-    color: #24B0FF;
-}
-
-table {
+/* Galvenais satura konteiners */
+.container {
     width: 100%;
-    border-collapse: collapse;
+    max-width: 900px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid gray;
+/* Virsraksti */
+h1 {
+    color: #58a6ff;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #79c0ff;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+/* Navigācija un pogas */
+.nav-links {
+    margin-bottom: 20px;
     text-align: left;
 }
 
-.first {
-    color: #0FC3FF;
-    font-weight: bold;
+a {
+    text-decoration: none;
+    color: #58a6ff;
 }
 
-nav {
+a:hover {
+    text-decoration: underline;
+}
+
+/* Glīts pogas stils (noņem violetās saites krāsu un pasvītrojumu) */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #00d2ff;
+    color: #0d1117 !important;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #80e5ff;
+    color: #0d1117 !important;
+    transform: translateY(-2px);
+    text-decoration: none !important;
+}
+
+.btn:visited {
+    color: #0d1117 !important;
+}
+
+/* Noteikumu sadaļas */
+.rules-section {
+    background-color: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
-nav a {
-    color: #75cdff;
-    margin-right: 20px;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
+.rules-section p {
+    margin-bottom: 10px;
+    color: #8b949e;
 }
 
-nav a:hover {
-    text-decoration: underline;
+.rules-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.rules-section li {
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+
+/* Tabulas stils (Līderu tabulai un vadībai) */
+.controls-table, .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.controls-table th, .controls-table td,
+.leaderboard-table th, .leaderboard-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #30363d;
+}
+
+.controls-table th, .leaderboard-table th {
+    background-color: #21262d;
+    color: #58a6ff;
+    font-weight: 600;
+}
+
+.controls-table tr:hover, .leaderboard-table tr:hover {
+    background-color: #1c2128;
+}
+
+/* Akcentēts teksts un koda bloki */
+strong {
+    color: #f0f6fc;
+}
+
+code {
+    background-color: #21262d;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #f0883e;
+    font-family: monospace;
 }

@@ -182,7 +182,7 @@ def main():
 
             enemy_spawn_timer += 1
             spawn_threshold = max(35, 80 - level * 5)
-            if enemies_spawned_in_wave < total_enemies_in_wave and len(enemies) < 6:
+            if enemies_spawned_in_wave < total_enemies_in_wave and len(enemies) < 5:
                 if enemy_spawn_timer > spawn_threshold:
                     enemies.append(Enemy(random.randint(50, SCREEN_WIDTH - 90), random.randint(50, 220), level))
                     enemies_spawned_in_wave += 1
